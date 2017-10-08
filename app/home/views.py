@@ -15,6 +15,25 @@ from .. import db
 from ..models import Weathers_xz, User
 from flask_login import login_required, current_user
 
+#API = 'https://api.seniverse.com/v3/weather/now.json'
+# API 抓取信息，并设置location为待输入变量
+history_list = [] #list
+def fetchWeather(location):
+    result = requests.get(API, params={
+        'key': KEY,
+        'location': location,
+        'language': LANGUAGE,
+        'unit': UNIT
+        }, timeout=1)
+    result = result.json() # Very import very import, if no this syntax, there is a erro called "subscriptable"
+    weather = result['results'][0]['now']['text'] #因为result是由一个Dir+list+Dir组成, for [0],becaues it's a list which only have 1 element
+    temperature = result['results'][0]['now']['temperature']
+    updated_time_c = result['results'][0]['last_update']
+    updated_time = updated_time_c.split('T')[0]
+
+    #weather_str = f'{location}天气:{weather},气温:{temperature}℃\n更新时间:{updated_time}.\n'
+    return updated_time, location, weather, temperature
+
 @home.route('/')
 def homepage():
     """
@@ -30,60 +49,36 @@ def dashboard():
     """
     return render_template('home/dashboard.html', title="Dashboard")
 
-#API = 'https://api.seniverse.com/v3/weather/now.json'
-# API 抓取信息，并设置location为待输入变量
-history_list = [] #list
-def fetchWeather(location):
-    result = requests.get(API, params={
-        'key': KEY,
-        'location': location,
-        'language': LANGUAGE,
-        'unit': UNIT
-        }, timeout=3)
-    result = result.json() # Very import very import, if no this syntax, there is a erro called "subscriptable"
-    weather = result['results'][0]['now']['text'] #因为result是由一个Dir+list+Dir组成, for [0],becaues it's a list which only have 1 element
-    temperature = result['results'][0]['now']['temperature']
-    updated_time = result['results'][0]['last_update']
-    updated_time = updated_time.split('T')[0]
-
-    #weather_str = f'{location}天气:{weather},气温:{temperature}℃\n更新时间:{updated_time}.\n'
-    return updated_time, location, weather, temperature
-
-@home.route('/')
-def index():
-    return render_template('home/index.html', title="Welcome")
-
-@home.route('/user_request',methods=['GET', 'POST'])
+@home.route('/user_request', methods=['GET', 'POST'])
+@login_required
 def process_request():
     city = request.args.get('city')
-    select = Weathers.query.filter_by(location=city).first()
-
     if request.args.get('query') == u'查询':
-        #weather_str = retrieve_data(city) #this weather_str also came from the database.py
-        select = Weathers.query.filter_by(location=city).first()
+        select = Weathers_xz.query.filter_by(location=city, user_id=current_user.id).first()
+
         if select:
             updated_time = select.day
             location = city
             weather = select.weather
             temperature = select.temperature
-            return render_template("home/query.html", updated_time=updated_time, location=location, weather=weather, temperature=temperature)
+            #return render_template("home/query.html", updated_time=updated_time,
+            #                        location=location, weather=weather, temperature=temperature)
 
         else:
             try:                                         # try must be in a very smart combined with except!!
                 updated_time, location, weather, temperature = fetchWeather(city)
-                select.location = location
-                select.day = updated_time
-                select.weather = weather
-                select.temperature = temperature
-                db.session.add(weathers)
+                weather_xz = Weather_xz(location=location,day=updated_time,weather=weather,temperature=temperature)
+                db.session.add(weather_xz)
                 db.session.commit()
-                #weather_str = '{}, {}的天气为{}, 气温{}°'.format(updated_time, location, weather, temperature) # must be here, or there will be error
-                #history_list.append(weather_str) // this from the API
-                return render_template("home/query.html", updated_time=updated_time, location=location, weather=weather, temperature=temperature, title="Query")
             except KeyError:
                 return render_template("error.html",city=city)
+
+        return render_template("home/query.html", updated_time=updated_time,
+                                    location=location, weather=weather, temperature=temperature, title="Query"
+                                    )
+
     elif request.args.get('history') == u'历史':
-        lists = Weathers.query.filter_by.all(location=city).first()
+        lists = Weathers_xz.query.filter_by(location=city).first()
         history_list = lists
         return render_template("home/history.html", history_list=history_list)
 
@@ -93,7 +88,7 @@ def process_request():
     elif request.args.get('update') == u'更新':
         try:
             location, weather = city.split(" ") #!!! say the web
-            select = Weathers.query.filter_by(location=city).first()
+            select = Weathers_xz.query.filter_by(location=location).first()
             if select:
                 if weather in weathercode.values():
                     select.weather = weather
