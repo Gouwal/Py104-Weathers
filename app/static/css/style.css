@@ -71,7 +71,8 @@ p.copyright {
     padding-bottom: 50px;
     text-align: center;
     color: #f8f8f8;
-    background: url(../img/intro-bg.jpg) no-repeat center center;
+    background-image: url(http://upload-images.jianshu.io/upload_images/6167135-a84a37a3a31de1ef.JPG?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240) no-repeat center center;
+    /*background: url(../img/intro-bg.jpg) no-repeat center center;*/
     background-size: cover;
     height: 100%;
 }

@@ -1,0 +1,28 @@
+{% extends "index.html" %}
+{% block content %}
+<style>
+p.ex4
+{
+	font:18px/20px 微软雅黑,中文; font-weight: bold;
+}
+
+p.ex5
+{
+	font:italic bold 12px/30px Georgia,serif;
+}
+
+p.ex6
+{
+	font:italic bold 12px/30px Helvetica,Sans-serif;
+}
+</style>
+<div class="text-center" style="color:#faebd7;font-weight:bold">
+
+    <p style="font-size:35px">{{ location }}</p>
+    <p style="font-size:25px">天气:{{ weather }}</p>
+    <p style="font-size:25px">温度:{{ temperature }}°C</p>
+    <p style="font-size:20px">时间:{{ updated_time }}</p>
+
+
+</div>
+{% endblock %}
