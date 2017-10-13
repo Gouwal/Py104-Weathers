@@ -4,20 +4,61 @@ from flask import Flask, render_template, request, url_for
 import requests
 import json
 import re
-#import sys
-#sys.path.append("C:\\Users\\CNNEZHA2\\mystuff\\Py104\\Py101-004\\Chap5\\project")
-#sys.path.append("C:\\Users\\CNNEZHA2\\mystuff\\Py104\\Py101-004\\Chap5\\project\\instance")
-#sys.path.append("C:\\Users\\CNNEZHA2\\mystuff\\Py104\\Py101-004\\Chap5\\project\\app")
-from instance.config import API, KEY, UNIT, LANGUAGE, weathercode
+#from instance.config import UNIT, LANGUAGE, weathercode
 from flask_sqlalchemy import SQLAlchemy
 from . import home
 from .. import db
 from ..models import Weathers_xz, User
 from flask_login import login_required, current_user
+from .forms import QueryForm
 
-#API = 'https://api.seniverse.com/v3/weather/now.json'
+API = 'https://api.seniverse.com/v3/weather/now.json'
+KEY = 'inpt4hjarhzfge3s'  # API key
+UNIT = 'c'  # 单位
+LANGUAGE = 'zh-Hans'  # 查询结果的返回语言
+# 天气代码词典
+weathercode = { "0": "晴",
+                "1": "晴",
+                "2": "晴",
+                "3": "晴",
+                "4": "多云",
+                "5": "晴间多云",
+                "6": "晴间多云",
+                "7": "大部多云",
+                "8": "大部多云",
+                "9": "阴",
+                "10": "阵雨",
+                "11": "雷阵雨",
+                "12": "雷阵雨伴有冰雹",
+                "13": "小雨",
+                "14": "中雨",
+                "15": "大雨",
+                "16": "暴雨",
+                "17": "大暴雨",
+                "18": "特大暴雨",
+                "19": "冻雨",
+                "20": "雨夹雪",
+                "21": "阵雪",
+                "22": "小雪",
+                "23": "中雪",
+                "24": "大雪",
+                "25": "暴雪",
+                "26": "浮尘",
+                "27": "扬沙",
+                "28": "沙尘暴",
+                "29": "强沙尘暴",
+                "30": "雾",
+                "31": "霾",
+                "32": "风",
+                "33": "大风",
+                "34": "飓风",
+                "35": "热带风暴",
+                "36": "龙卷风",
+                "37": "冷",
+                "38": "热",
+"99": "未知"}
 # API 抓取信息，并设置location为待输入变量
-history_list = [] #list
+history_list = None #list
 def fetchWeather(location):
     result = requests.get(API, params={
         'key': KEY,
@@ -32,70 +73,85 @@ def fetchWeather(location):
     updated_time = updated_time_c.split('T')[0]
 
     #weather_str = f'{location}天气:{weather},气温:{temperature}℃\n更新时间:{updated_time}.\n'
-    return updated_time, location, weather, temperature
+    return location, weather, temperature, updated_time
 
 @home.route('/')
 def homepage():
     """
     Render the homepage template on the / route
     """
-    return render_template('home/index.html', title="Welcome")
+    return render_template('index.html', title="Welcome")
 
-@home.route('/dashboard')
-@login_required
-def dashboard():
-    """
-    Render the dashboard template on the /dashboard route
-    """
-    return render_template('home/dashboard.html', title="Dashboard")
 
-@home.route('/user_request', methods=['GET', 'POST'])
-@login_required
-def process_request():
-    city = request.args.get('city')
-    if request.args.get('query') == u'查询':
-        select = Weathers_xz.query.filter_by(location=city, user_id=current_user.id).first()
+@home.route('/index', methods=['GET', 'POST'])
+#@login_required
+def query():
+#    city = request.args.get['city']
+    inquiry_outcome = None
+    inquiry_history = None
+    help_information = None
+    is_updated = None
+    error = None
 
-        if select:
-            updated_time = select.day
-            location = city
-            weather = select.weather
-            temperature = select.temperature
-            #return render_template("home/query.html", updated_time=updated_time,
-            #                        location=location, weather=weather, temperature=temperature)
+    if request.method == "POST":
+        if request.form['action'] == u'查询':
+            select = Weathers_xz.query.filter_by(location=request.form['city'],
+                                                user_id=current_user.id).first()
+
+            if select:
+                inquiry_outcome = select
+            else:
+                #city = request.form['city']
+                inquiry = fetchWeather(request.form['city'])
+                if inquiry:
+                    try:
+                        weather_xz = Weathers_xz(location=inquiry[0],
+                                            weather=inquiry[1],
+                                            temperature=inquiry[2],
+                                            day=inquiry[3],
+                                            user_id=current_user.id)
+                        db.session.add(weather_xz)
+                        db.session.commit()
+                        inquiry_outcome = Weathers_xz.query.filter_by(location=inquir[0],
+                                                                    user_id=current_user.id).first()
+                    except SALAchemyError as e:
+                        print (e)
+                    finally:
+                        session.close()
+
+                return render_template('home/query.html', updated_time=inquiry_outcome[3],
+                                    location=inquiry_outcome[0],
+                                    weather=inquiry_outcome[1],
+                                    temperature=inquiry_outcome[2], title="Query")
+
+        elif request.form['action'] == u'历史':
+            lists = current_user.weather_xz.all()
+            inquiry_history = lists
+            return render_template('home/history.html', history_list=inquiry_history)
+
+
+        elif request.form['action']== u'更新':
+            try:
+                location, weather = (request.form['location']).split(" ") #!!! say the web
+                select = Weathers_xz.query.filter_by(location=location,
+                                                    user_id=current_user.id).first()
+                if select:
+                    if weather in weathercode.values():
+                        select.weather = weather
+                        select.day = now
+                        db.session.commit()
+                        return render_template('home/update.html')
+                    else:
+                        is_updated = "输入天气信息有误！"
+                else:
+                    is_updated = "该城市不在查询历史中。"
+            except ValueError:
+                is_updated = "请按（城市名 常见天气）格式输入！"
 
         else:
-            try:                                         # try must be in a very smart combined with except!!
-                updated_time, location, weather, temperature = fetchWeather(city)
-                weather_xz = Weather_xz(location=location,day=updated_time,weather=weather,temperature=temperature)
-                db.session.add(weather_xz)
-                db.session.commit()
-            except KeyError:
-                return render_template("error.html",city=city)
+            #request.args.get['action'] == u'帮助':
+            help_information = 1
+            return render_template("home/help.html", help_information=help_information)
 
-        return render_template("home/query.html", updated_time=updated_time,
-                                    location=location, weather=weather, temperature=temperature, title="Query"
-                                    )
-
-    elif request.args.get('history') == u'历史':
-        lists = Weathers_xz.query.filter_by(location=city).first()
-        history_list = lists
-        return render_template("home/history.html", history_list=history_list)
-
-    elif request.args.get('help') == '帮助':
-        return render_template('home/help.html')
-
-    elif request.args.get('update') == u'更新':
-        try:
-            location, weather = city.split(" ") #!!! say the web
-            select = Weathers_xz.query.filter_by(location=location).first()
-            if select:
-                if weather in weathercode.values():
-                    select.weather = weather
-                    select.day = now
-                    db.session.commit()
-                    return render_template('home/update.html')
-                else:
-                    is_updated = "输入天气信息有误！"
-        except ValueError:
-            return render_template("home/error.html")
+    else:
+        return render_template('index.html', title="Query")
