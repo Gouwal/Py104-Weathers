@@ -4,7 +4,7 @@ class Config(object):
     """
     Common configurations
     """
-    #WTF_CSRF_ENABLED = True
+    WTF_CSRF_ENABLED = True
     # Put any configurations here that are common across all environments
 
 class DevelopmentConfig(Config):
