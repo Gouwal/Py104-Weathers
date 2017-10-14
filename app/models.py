@@ -17,7 +17,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(60), index=True, unique=True)
     username = db.Column(db.String(60), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    weather = db.relationship('Weathers_xz', backref='querier', lazy='dynamic')
+    weather_xz = db.relationship('Weathers_xz', backref='user', lazy='dynamic')
 
     @property
     def password(self):
@@ -54,12 +54,17 @@ class Weathers_xz(db.Model):
     __tablename__ = 'weather_xz'
 
     id = db.Column(db.Integer, primary_key=True)
-    location = db.Column(db.String(60))
+    location = db.Column(db.String(60), unique=True)
     weather = db.Column(db.String(60))
     temperature = db.Column(db.String(60))
     day = db.Column(db.String(80))
 #    code = db.Column(db.String(10))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    def __init__(self, location, weather, temperature, day):
+        self.location = location
+        self.weather = weather
+        self.temperature = temperature
+        self.day = day
 
     def __repr__(self):
-        return '<Weather: {}>'.format(self.city)
+        return '<Weathers_xz: {}>'.format(self.location)

@@ -1,5 +1,6 @@
 {% extends "index.html" %}
-{% block content %}
+{% block title %}Query{% endblock %}
+{% block body %}
 <style>
 p.ex4
 {
@@ -16,13 +17,13 @@ p.ex6
 	font:italic bold 12px/30px Helvetica,Sans-serif;
 }
 </style>
-<div class="text-center" style="color:#faebd7;font-weight:bold">
 
+<div class="text-center" style="color:#faebd7;font-weight:bold">
+<form action="" method="POST">
     <p style="font-size:35px">{{ location }}</p>
     <p style="font-size:25px">天气:{{ weather }}</p>
     <p style="font-size:25px">温度:{{ temperature }}°C</p>
     <p style="font-size:20px">时间:{{ updated_time }}</p>
-
-
+</form>
 </div>
 {% endblock %}

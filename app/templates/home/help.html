@@ -1,6 +1,6 @@
 {% extends "index.html" %}
 {% block content %}
-
+{% if help_information %}
 
 <h4><div class="col-xs-12 col-md-12 text-center" style="font-weight:bold">
 
@@ -9,5 +9,5 @@
   <p style="font-family:微软雅黑,Times,serif;font-size:25px;color:#7cfc00">点击<b>历史</b>, 获取查询历史 </p>
 
 </div></h4>
-
+{% endif %}
 {% endblock %}

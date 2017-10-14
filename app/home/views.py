@@ -10,7 +10,7 @@ from . import home
 from .. import db
 from ..models import Weathers_xz, User
 from flask_login import login_required, current_user
-from .forms import QueryForm
+#from .forms import QueryForm
 
 API = 'https://api.seniverse.com/v3/weather/now.json'
 KEY = 'inpt4hjarhzfge3s'  # API key
@@ -83,9 +83,9 @@ def homepage():
     return render_template('index.html', title="Welcome")
 
 
-@home.route('/index', methods=['GET', 'POST'])
-#@login_required
-def query():
+@home.route('/query_xz', methods=['GET', 'POST'])
+@login_required
+def query_xz():
 #    city = request.args.get['city']
     inquiry_outcome = None
     inquiry_history = None
@@ -114,10 +114,8 @@ def query():
                         db.session.commit()
                         inquiry_outcome = Weathers_xz.query.filter_by(location=inquir[0],
                                                                     user_id=current_user.id).first()
-                    except SALAchemyError as e:
-                        print (e)
-                    finally:
-                        session.close()
+                    except ValueError:
+                        is_updated = "亲，肯定是系统错误，您再试一下！"
 
                 return render_template('home/query.html', updated_time=inquiry_outcome[3],
                                     location=inquiry_outcome[0],
@@ -151,7 +149,7 @@ def query():
         else:
             #request.args.get['action'] == u'帮助':
             help_information = 1
-            return render_template("home/help.html", help_information=help_information)
+            return render_template('home/help.html', help_information=help_information)
 
     else:
         return render_template('index.html', title="Query")

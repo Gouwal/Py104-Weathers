@@ -2,11 +2,13 @@
 
 from flask import flash, redirect, render_template, url_for
 from flask_login import login_required, login_user, logout_user
-
+#from flask_wtf import Form
+#from flask_bootstrap import Bootstrap
 from . import auth
 from .forms import LoginForm, RegistrationForm
 from .. import db
 from ..models import User
+
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
@@ -17,8 +19,8 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         users = User(email=form.email.data,
-                            username=form.username.data,
-                            password=form.password.data)
+                    username=form.username.data,
+                    password=form.password.data)
 
         # add user to the database
         db.session.add(users)
@@ -44,13 +46,12 @@ def login():
         # the password entered matches the password in the database
 
         users = User.query.filter_by(email=form.email.data).first()
-        if users is not None and users.verify_password(
-                form.password.data):
+        if users is not None and users.verify_password(form.password.data):
             # log use in
             login_user(users)
 
             # redirect to the dashboard page after login
-            return redirect(url_for('home.dashboard'))
+            return redirect(url_for('home.homepage'))
 
         # when login details are incorrect
         else:
