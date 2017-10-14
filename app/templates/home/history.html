@@ -19,17 +19,14 @@ p.ex6
 
 <div class="ex4" style="font-weight:bold;text-align:center;color:#faebd7">
 
-{% for item in history_list %}
-
-		<p>{{ item[1] }}：
-	    {{ item[2] }}
-	    {{ item[3] }}°C
-			更新时间：{{ item[0]}}</p>
-
-	<!--{{item}}-->
-
-{% endfor %}
-
+{% if inquiry_history %}
+{% for item in inquiry_history %}
+	<p>{{ item.location }}：
+			{{ item.condition }}
+			{{ item.temp }}°C
+			更新时间：{{ item.day }}</p>
+		{% endfor %}
+{% endif %}
 
 </div>
 {% endblock %}

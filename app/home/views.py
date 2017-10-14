@@ -9,6 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 from . import home
 from .. import db
 from ..models import Weathers_xz, User
+from datetime import datetime
 from flask_login import login_required, current_user
 #from .forms import QueryForm
 
@@ -112,20 +113,22 @@ def query_xz():
                                             user_id=current_user.id)
                         db.session.add(weather_xz)
                         db.session.commit()
-                        inquiry_outcome = Weathers_xz.query.filter_by(location=inquir[0],
+                        inquiry_outcome = Weathers_xz.query.filter_by(location=inquiry[0],
                                                                     user_id=current_user.id).first()
                     except ValueError:
                         is_updated = "亲，肯定是系统错误，您再试一下！"
 
-                return render_template('home/query.html', updated_time=inquiry_outcome[3],
-                                    location=inquiry_outcome[0],
-                                    weather=inquiry_outcome[1],
-                                    temperature=inquiry_outcome[2], title="Query")
+                else:
+                    is_updated = "亲，您输入的城市错误，请再试一下！"
+
+                return render_template('home/query.html', inquiry_outcome=inquiry_outcome, title="Query")
+
+
 
         elif request.form['action'] == u'历史':
             lists = current_user.weather_xz.all()
             inquiry_history = lists
-            return render_template('home/history.html', history_list=inquiry_history)
+            return render_template('home/history.html', inquiry_history=inquiry_history)
 
 
         elif request.form['action']== u'更新':

@@ -60,7 +60,7 @@ class Weathers_xz(db.Model):
     day = db.Column(db.String(80))
 #    code = db.Column(db.String(10))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    def __init__(self, location, weather, temperature, day):
+    def __init__(self, location, weather, temperature, day, user_id):
         self.location = location
         self.weather = weather
         self.temperature = temperature
