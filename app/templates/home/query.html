@@ -19,12 +19,11 @@ p.ex6
 </style>
 
 <div class="text-center" style="color:#faebd7;font-weight:bold">
-		{% if inquiry_outcome %}
 		<h2>{{ inquiry_outcome.location }}</h2>
 		<!-- <p><img src= {{ "static/img/3d_180/" + inquiry_outcome.code|string + ".png" }} ></p> -->
 		<p>天气：{{ inquiry_outcome.weather }}</p>
 		<p>温度：{{ inquiry_outcome.temperature }}°C</p>
 		<p>时间：{{ inquiry_outcome.day }}</p>
 </div>
-		{% endif %}
+
 {% endblock %}
