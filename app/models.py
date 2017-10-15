@@ -54,7 +54,7 @@ class Weathers_xz(db.Model):
     __tablename__ = 'weather_xz'
 
     id = db.Column(db.Integer, primary_key=True)
-    location = db.Column(db.String(60), unique=True)
+    location = db.Column(db.String(60))
     weather = db.Column(db.String(60))
     temperature = db.Column(db.String(60))
     day = db.Column(db.String(80))

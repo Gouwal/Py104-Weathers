@@ -111,12 +111,12 @@ def query_xz():
                 db.session.commit()
                 inquiry_outcome = Weathers_xz.query.filter_by(location=location,
                                                             user_id=current_user.id).first_or_404()
-            return render_template("home/query.html", inquiry_outcome=inquiry_outcome, title="Query")
+            return render_template('home/query.html', inquiry_outcome=inquiry_outcome, title="Query")
 
         elif request.form['action'] == u'历史':
             lists = current_user.weather_xz.all()
             inquiry_history = lists
-            return render_template("home/history.html", inquiry_history=inquiry_history)
+            return render_template('home/history.html', inquiry_history=inquiry_history)
 
 
         elif request.form['action']== u'更新':

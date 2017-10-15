@@ -1,23 +1,6 @@
 {% extends "index.html" %}
 {% block title %}Query{% endblock %}
 {% block body %}
-<style>
-p.ex4
-{
-	font:18px/20px 微软雅黑,中文; font-weight: bold;
-}
-
-p.ex5
-{
-	font:italic bold 12px/30px Georgia,serif;
-}
-
-p.ex6
-{
-	font:italic bold 12px/30px Helvetica,Sans-serif;
-}
-</style>
-
 <div class="text-center" style="color:#faebd7;font-weight:bold">
 		<h2>{{ inquiry_outcome.location }}</h2>
 		<!-- <p><img src= {{ "static/img/3d_180/" + inquiry_outcome.code|string + ".png" }} ></p> -->
@@ -25,5 +8,4 @@ p.ex6
 		<p>温度：{{ inquiry_outcome.temperature }}°C</p>
 		<p>时间：{{ inquiry_outcome.day }}</p>
 </div>
-
 {% endblock %}

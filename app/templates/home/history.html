@@ -1,23 +1,7 @@
 {% extends "index.html" %}
 {% block content %}
-<style>
-p.ex4
-{
-	font:18px/20px 微软雅黑,中文; font-weight: bold;
-}
 
-p.ex5
-{
-	font:italic bold 12px/30px Georgia,serif;
-}
-
-p.ex6
-{
-	font:italic bold 12px/30px Helvetica,Sans-serif;
-}
-</style>
-
-<div class="ex4" style="font-weight:bold;text-align:center;color:#faebd7">
+<div class="col-xs-12 col-md-12 text-center" style="font-weight:bold">
 
 {% for item in inquiry_history %}
 	<p>{{ item.location }}：
