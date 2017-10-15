@@ -59,7 +59,7 @@ weathercode = { "0": "晴",
                 "38": "热",
 "99": "未知"}
 # API 抓取信息，并设置location为待输入变量
-history_list = None #list
+history_list = [] #list
 def fetchWeather(location):
     result = requests.get(API, params={
         'key': KEY,
@@ -98,37 +98,25 @@ def query_xz():
         if request.form['action'] == u'查询':
             select = Weathers_xz.query.filter_by(location=request.form['city'],
                                                 user_id=current_user.id).first()
-
             if select:
                 inquiry_outcome = select
             else:
-                #city = request.form['city']
-                inquiry = fetchWeather(request.form['city'])
-                if inquiry:
-                    try:
-                        weather_xz = Weathers_xz(location=inquiry[0],
-                                            weather=inquiry[1],
-                                            temperature=inquiry[2],
-                                            day=inquiry[3],
-                                            user_id=current_user.id)
-                        db.session.add(weather_xz)
-                        db.session.commit()
-                        inquiry_outcome = Weathers_xz.query.filter_by(location=inquiry[0],
-                                                                    user_id=current_user.id).first()
-                    except ValueError:
-                        is_updated = "亲，肯定是系统错误，您再试一下！"
-
-                else:
-                    is_updated = "亲，您输入的城市错误，请再试一下！"
-
-                return render_template('home/query.html', inquiry_outcome=inquiry_outcome, title="Query")
-
-
+                location, weather, temperature, updated_time = fetchWeather(request.form['city'])
+                weather_xz = Weathers_xz(location=location,
+                                    weather=weather,
+                                    temperature=temperature,
+                                    day=updated_time,
+                                    user_id=current_user.id)
+                db.session.add(weather_xz)
+                db.session.commit()
+                inquiry_outcome = Weathers_xz.query.filter_by(location=location,
+                                                            user_id=current_user.id).first_or_404()
+            return render_template("home/query.html", inquiry_outcome=inquiry_outcome, title="Query")
 
         elif request.form['action'] == u'历史':
             lists = current_user.weather_xz.all()
             inquiry_history = lists
-            return render_template('home/history.html', inquiry_history=inquiry_history)
+            return render_template("home/history.html", inquiry_history=inquiry_history)
 
 
         elif request.form['action']== u'更新':
