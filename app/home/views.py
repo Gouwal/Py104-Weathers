@@ -66,7 +66,7 @@ def fetchWeather(location):
         'location': location,
         'language': LANGUAGE,
         'unit': UNIT
-        }, timeout=1)
+        }, timeout=3)
     result = result.json() # Very import very import, if no this syntax, there is a erro called "subscriptable"
     weather = result['results'][0]['now']['text'] #因为result是由一个Dir+list+Dir组成, for [0],becaues it's a list which only have 1 element
     temperature = result['results'][0]['now']['temperature']
