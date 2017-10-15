@@ -19,14 +19,12 @@ p.ex6
 
 <div class="ex4" style="font-weight:bold;text-align:center;color:#faebd7">
 
-{% if inquiry_history %}
 {% for item in inquiry_history %}
 	<p>{{ item.location }}：
-			{{ item.condition }}
-			{{ item.temp }}°C
+			{{ item.weather }}
+			{{ item.temperature }}°C
 			更新时间：{{ item.day }}</p>
 		{% endfor %}
-{% endif %}
 
 </div>
 {% endblock %}
