@@ -81,12 +81,12 @@ def homepage():
     """
     Render the homepage template on the / route
     """
-    return render_template('index.html', title="Welcome")
+    return render_template('home/index.html', title="Welcome")
 
 
-@home.route('/query_xz', methods=['GET', 'POST'])
+@home.route('/query', methods=['GET', 'POST'])
 @login_required
-def query_xz():
+def query():
 #    city = request.args.get['city']
     inquiry_outcome = None
     inquiry_history = None
@@ -116,7 +116,7 @@ def query_xz():
         elif request.form['action'] == u'历史':
             lists = current_user.weather_xz.all()
             inquiry_history = lists
-            return render_template('home/history.html', inquiry_history=inquiry_history)
+            return render_template('home/query.html', inquiry_history=inquiry_history)
 
 
         elif request.form['action']== u'更新':
@@ -129,7 +129,7 @@ def query_xz():
                         select.weather = weather
                         select.day = now
                         db.session.commit()
-                        return render_template('home/update.html')
+                        return render_template('home/query.html')
                     else:
                         is_updated = "输入天气信息有误！"
                 else:
@@ -140,7 +140,7 @@ def query_xz():
         else:
             #request.args.get['action'] == u'帮助':
             help_information = 1
-            return render_template('home/help.html', help_information=help_information)
+            return render_template('home/query.html', help_information=help_information)
 
     else:
         return render_template('index.html', title="Query")
