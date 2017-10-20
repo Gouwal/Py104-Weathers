@@ -114,8 +114,7 @@ def query():
             return render_template('home/query.html', inquiry_outcome=inquiry_outcome, title="Query")
 
         elif request.form['action'] == u'历史':
-            lists = current_user.weather_xz.all()
-            inquiry_history = lists
+            inquiry_history = current_user.weather_xz.all()
             return render_template('home/query.html', inquiry_history=inquiry_history)
 
 
@@ -143,4 +142,4 @@ def query():
             return render_template('home/query.html', help_information=help_information)
 
     else:
-        return render_template('index.html', title="Query")
+        return render_template('home/query.html', title="Query")
