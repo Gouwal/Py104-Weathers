@@ -110,7 +110,7 @@ def query():
                 db.session.add(weather_xz)
                 db.session.commit()
                 inquiry_outcome = Weathers_xz.query.filter_by(location=location,
-                                                            user_id=current_user.id).first_or_404()
+                                                            user_id=current_user.id).first()
             return render_template('home/query.html', inquiry_outcome=inquiry_outcome, title="Query")
 
         elif request.form['action'] == u'历史':
