@@ -109,37 +109,34 @@ def query():
                                     user_id=current_user.id)
                 db.session.add(weather_xz)
                 db.session.commit()
-                inquiry_outcome = Weathers_xz.query.filter_by(location=location,
-                                                            user_id=current_user.id).first()
-            return render_template('home/query.html', inquiry_outcome=inquiry_outcome, title="Query")
+                inquiry_outcome = Weathers_xz.query.filter_by(location=location).first()
 
         elif request.form['action'] == u'历史':
             inquiry_history = current_user.weather_xz.all()
-            return render_template('home/query.html', inquiry_history=inquiry_history)
-
 
         elif request.form['action']== u'更新':
             try:
                 location, weather = (request.form['location']).split(" ") #!!! say the web
-                select = Weathers_xz.query.filter_by(location=location,
-                                                    user_id=current_user.id).first()
+                select = Weathers_xz.query.filter_by(location=location).first()
                 if select:
                     if weather in weathercode.values():
                         select.weather = weather
                         select.day = now
                         db.session.commit()
-                        return render_template('home/query.html')
                     else:
                         is_updated = "输入天气信息有误！"
                 else:
                     is_updated = "该城市不在查询历史中。"
             except ValueError:
                 is_updated = "请按（城市名 常见天气）格式输入！"
-
         else:
             #request.args.get['action'] == u'帮助':
             help_information = 1
-            return render_template('home/query.html', help_information=help_information)
-
+        return render_template("home/query.html",
+            inquiry_outcome=inquiry_outcome,
+            inquiry_history=inquiry_history,
+            help_information=help_information,
+            is_updated=is_updated,
+            error=error, title="Query")
     else:
         return render_template('home/query.html', title="Query")
